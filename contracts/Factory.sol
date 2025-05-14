@@ -26,12 +26,21 @@ contract Factory {
 
     mapping(address => TokenSale) tokenToSale;
 
+    event Created(address indexed token);
+
     constructor(uint256 _fee) {
         fee = _fee;
         owner = msg.sender;
     }
 
+    function getTokenSale(uint _index) public view returns(TokenSale memory){
+        return tokenToSale[tokens[_index]];
+    }
+
     function create(string memory _name, string memory _symbol) external payable {
+
+        require(msg.value == fee, "Factory: Creator fee not met");
+
         // create a token
         Token token = new Token(msg.sender, _name, _symbol, 1000_000 ether);
 
@@ -50,6 +59,9 @@ contract Factory {
     );
 
     tokenToSale[address(token)] = sale;
-    }
 
+    
+    // Tell people it's live
+    emit Created(address(token));
+    }
 }
