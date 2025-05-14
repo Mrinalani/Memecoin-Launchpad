@@ -15,6 +15,17 @@ contract Factory {
     address[] public tokens;
     uint256 public totalTokens;
 
+    struct TokenSale {
+        address token;
+        string name;
+        address creator;
+        uint sold;
+        uint raised;
+        bool isOpen;
+    }
+
+    mapping(address => TokenSale) tokenToSale;
+
     constructor(uint256 _fee) {
         fee = _fee;
         owner = msg.sender;
@@ -27,5 +38,18 @@ contract Factory {
         // save token for later use
         tokens.push(address(token));
         totalTokens++;
+
+        // List the token for sale
+    TokenSale memory sale = TokenSale (
+        address(token),
+        _name,
+        msg.sender,
+        0,
+        0,
+        true
+    );
+
+    tokenToSale[address(token)] = sale;
     }
+
 }
