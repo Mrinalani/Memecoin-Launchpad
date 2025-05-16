@@ -24,9 +24,10 @@ contract Factory {
         bool isOpen;
     }
 
-    mapping(address => TokenSale) tokenToSale;
+    mapping(address => TokenSale) public tokenToSale;
 
     event Created(address indexed token);
+    event Buy(address indexed token, uint256 amount);
 
     constructor(uint256 _fee) {
         fee = _fee;
@@ -63,5 +64,17 @@ contract Factory {
     
     // Tell people it's live
     emit Created(address(token));
+    }
+
+    function buy(address _token, uint _amount) external payable{
+
+        // update the sale
+        TokenSale storage sale = tokenToSale[_token];
+
+        sale.sold += _amount;
+
+        Token(_token).transfer(msg.sender, _amount);
+
+        emit Buy(_token, _amount);
     }
 }

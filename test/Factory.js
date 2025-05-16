@@ -9,7 +9,7 @@ describe("Factory", function(){
  async function deployFactoryFixture() {
 
       // fetch deployer
-      const [deployer, creator] = await ethers.getSigners(); // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+      const [deployer, creator, buyer] = await ethers.getSigners(); // 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
       // console.log("testing",deployer,creator);
       //fetch contract
       const Factory = await ethers.getContractFactory("Factory");
@@ -28,7 +28,19 @@ describe("Factory", function(){
      const token = await ethers.getContractAt("Token", tokenAddress); // Loads the contract’s ABI and returns an instance that lets you interact with it.
           // console.log("testing2",token);
 
-     return {factory, token, deployer, creator};
+     return {factory, token, deployer, creator, buyer};
+  }
+
+  async function buyTokenFixture() {
+    const {factory, token, creator, buyer} = await deployFactoryFixture();
+
+    const AMOUNT = ethers.parseUnits("10000", 18);
+    const COST = ethers.parseUnits("1", 18);
+
+    const transaction = await factory.connect(buyer).buy(await token.getAddress(), AMOUNT, {value: COST});
+  await transaction.wait();
+
+    return{factory, token, creator, buyer};
   }
 
   // factory -> u can access functions of factory contract;
@@ -95,6 +107,39 @@ describe("Factory", function(){
       expect(sale.raised).to.equal(0);
       expect(sale.isOpen).to.equal(true);
     })
+
+  })
+
+  describe("buying", function() {
+
+    const AMOUNT = ethers.parseUnits("10000", 18);
+    const COST = ethers.parseUnits("1", 18);
+
+    // check contract receive ETH
+    it("should update balance", async function() {
+      const { factory } = await loadFixture(buyTokenFixture)
+
+      const balance = await ethers.provider.getBalance(await factory.getAddress());
+
+      expect(balance).to.equal(FEE + COST);
+    })
+
+    // check buyer receive Token
+    it("should update the token balance", async function() {
+      const { token, buyer } = await loadFixture(buyTokenFixture);
+      
+      const balance = await token.balanceOf(buyer.address);
+
+      expect(balance).to.equal(AMOUNT);
+    });
+
+    it("should update the token sale", async function() {
+      const { factory, token } = await loadFixture(buyTokenFixture);
+      
+      const sale = await factory.tokenToSale(await token.getAddress());
+
+      expect(sale.sold).to.equal(AMOUNT);
+    });
 
   })
 })
