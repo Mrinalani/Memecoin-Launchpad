@@ -3,7 +3,9 @@ import { ethers } from "ethers"
 function List({ toggleCreate, fee, provider, factory }) {
   async function listHandler(form) {
     const name = form.get("name")
-    const ticker = form.get("ticker")
+    const ticker = form.get("ticker") 
+
+    console.log("submitted", name, ticker);
 
     const signer = await provider.getSigner()
 
