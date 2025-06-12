@@ -8,8 +8,8 @@ contract TestFactory {
     address public immutable owner;
     uint256 public totalTokens;
     address[] public tokens;
-    uint256 constant TARGET = 3 ether;
-    uint256 constant TOKEN_LIMIT = 500_000 ether;
+    uint256  public constant TARGET = 3 ether;
+    uint256 public constant TOKEN_LIMIT = 500_000 ether;
 
     struct TokenSale {
         address token;

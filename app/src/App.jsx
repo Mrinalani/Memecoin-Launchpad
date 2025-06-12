@@ -35,17 +35,24 @@ const App = () => {
   const connectWallet = async () => {
      const provider = new ethers.BrowserProvider(window.ethereum)
     setProvider(provider)
+        console.log("wallet connected successfully")
+    console.log("provider", provider)
+
 
     // Get the current network
     const network = await provider.getNetwork()
+        console.log("networ", network.chainId)
+
 
     // Create reference to Factory contract
     const factory = new ethers.Contract(config[network.chainId].factory.address, Factory.abi, provider)
     setFactory(factory)
+    console.log(factory)
 
     // Fetch the fee
     const fee = await factory.FEE()
-    console.log(fee)
+    console.log("fee = ",fee)
+    console.log("testing")
     setFee(fee)
 
     // Prepare to fetch token details

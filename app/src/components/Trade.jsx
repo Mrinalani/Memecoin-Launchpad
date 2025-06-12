@@ -27,9 +27,12 @@ function Trade({ toggleTrade, token, provider, factory }) {
   async function getSaleDetails() {
     const target = await factory.TARGET()
     setTarget(target)
+    console.log(target)
 
     const limit = await factory.TOKEN_LIMIT()
     setLimit(limit)
+    console.log(limit)
+
 
     const cost = await factory.getCost(token.sold)
     setCost(cost)
